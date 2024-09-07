@@ -5,20 +5,22 @@ import jwt from "jsonwebtoken";
 export const registerUser = (req, res) => {
   const { name, email, password, mobile_no } = req.body;
 
+  console.log(req.body);
+
   // First, check if the user already exists
-  const checkUserQuery = "SELECT * FROM users WHERE mobile_no";
-  connection.query(checkUserQuery, [mobile_no], (err, result) => {
+  const checkUserQuery = "SELECT * FROM users WHERE mobile_no = ?";
+  connection.query(checkUserQuery, [mobile_no], async (err, result) => {
     if (err) {
       return res.status(500).json({ error: "Database error" });
     }
 
     if (result.length > 0) {
       // User already exists
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ error: "mobile no already exists" });
     }
 
     // If user does not exist, proceed with registration
-    const hashedPassword = bcrypt.hashSync(password, 8);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const insertUserQuery =
       "INSERT INTO users (name, email, password,mobile_no) VALUES (?, ?,?, ?)";
@@ -56,6 +58,6 @@ export const loginUser = (req, res) => {
     // Create a token
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
 
-    res.status(200).json({ auth: true, token });
+    res.status(200).json({ auth: true, token, message: "Login Success" });
   });
 };

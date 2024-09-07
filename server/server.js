@@ -6,11 +6,15 @@ import { todosTable } from "./Models/todoTable.js";
 import { userRouter } from "./Routes/userRoutes.js";
 import { todoRouter } from "./Routes/todoRoutes.js";
 
+import cors from "cors";
+
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, (err) => {
